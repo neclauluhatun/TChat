@@ -9,13 +9,15 @@ class loadTweets(object):
    
     def fetchTweets(self, since_id=None):
         if since_id:
-            tweets = self.api.home_timeline(since_id, count=100)
+            tweets = self.api.home_timeline(since_id, count=10)
         else:
-            tweets = self.api.home_timeline(count=100)
+            #tweets = self.api.home_timeline(screen_name="ozansener",count=10)
+            tweets = self.api.mentions(count=10)
         # parse each incoming tweet
         ts = []
         authors = []
-        for tweet in tweets: 
+        for tweet in tweets:
+           if tweet.author.screen_name=="ozansener" :
             t = {
             'author': tweet.author.screen_name,
             'contributors': tweet.contributors,
@@ -68,21 +70,21 @@ class loadTweets(object):
             }
             authors.append(u)
             ts.append(t)        
-        
-        # insert into db
-        try:
             print ts
-        except pymongo.errors.InvalidOperation: # no tweets?
-            pass
+            self.TweetAMessage()
+            #self.api.send_direct_message("ozansener","selamlar")
         
         if self.debug:
             print "added %s tweets to the db" % (len(ts))
+    def TweetAMessage(self):
+        #self.api.send_direct_message(screen_name = "ozansener", text = "selamlar")
+        self.api.update_status(status="hackABit test",in_reply_to_status_id=54659309837090816L)
+        #self.api.retweet(54659309837090816L)
     def __init__(self, debug=False):
         self.debug = debug
         auth = tweepy.OAuthHandler(settings.CONSUMER_KEY, settings.CONSUMER_SECRET)
         auth.set_access_token(settings.ACCESS_KEY, settings.ACCESS_SECRET)
         self.api = tweepy.API(auth)
-
         try:
             self.fetchTweets()
         except tweepy.error.TweepError: # authorization failure
@@ -90,8 +92,6 @@ class loadTweets(object):
             auth = self.setup_auth()
             self.api = tweepy.API(auth)
             self.fetchTweets()
-        
-
     # util classes    
     def setup_auth(self):
         """
