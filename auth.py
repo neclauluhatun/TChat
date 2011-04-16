@@ -7,16 +7,21 @@ import pickle
 import thread
 
 class loadTweets(object):
+    lastID=0
     def sendMessages(self,userName):
         while 1:
             message = str(raw_input("message?\n"))
             self.api.send_direct_message(screen_name = userName, text = message)
     def getMessage(self,userName):
         while 1:
-            mesajlar = self.api.direct_messages(count=10)
+            if ID:
+                mesajlar = self.api.direct_messages(since_id=lastID,count=10)
+            else:
+                mesajlar = self.api.direct_messages(count=10)
             for msg in mesajlar:
                 if msg.sender.screen_name == userName and msg.created_at > datetime.datetime(2011, 4, 15, 23, 36, 2):
                     print "Mesaj geldi = %s !" % msg.text
+                    self.lastID=msg.id
     def fetchTweets(self, since_id=None):
         if since_id:
             tweets = self.api.home_timeline(since_id, count=10)
