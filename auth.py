@@ -7,41 +7,27 @@ import pickle
 import thread
 
 class loadTweets(object):
-    def sendMessages(userName,self):
+    def sendMessages(self,userName):
+        while 1:
             message = str(raw_input("message?\n"))
             self.api.send_direct_message(screen_name = userName, text = message)
-    def getMessage(self):
+    def getMessage(self,userName):
+        while 1:
             mesajlar = self.api.direct_messages(count=10)
             for msg in mesajlar:
-               print "Mesaj geldi = %s !" %msg.text
+                if msg.sender.screen_name == userName and msg.created_at > datetime.datetime(2011, 4, 15, 23, 36, 2):
+                    print "Mesaj geldi = %s !" % msg.text
     def fetchTweets(self, since_id=None):
-##        if since_id:
-##            tweets = self.api.home_timeline(since_id, count=10)
-##        else:
-##            #tweets = self.api.home_timeline(screen_name="ozansener",count=10)
-##            tweets = self.api.mentions(count=10)
+        if since_id:
+            tweets = self.api.home_timeline(since_id, count=10)
+        else:
+            #tweets = self.api.home_timeline(screen_name="ozansener",count=10)
+            tweets = self.api.mentions(count=10)
         followers = self.api.followers(screen_name='msencer')
         # parse each incoming tweet
         ts = []
         users={}
         authors = []
-        print "Select a user:\n"
-        i=0
-        for fw in followers:
-            i+=1
-            print "%d - %s" % (i,fw.screen_name)
-            users[i]=fw.screen_name
-        choice = int(raw_input("make your choice?\n"))
-        
-        #try:
-        deger = str(users[choice])
-        
-        thread.start_new_thread(self.sendMessages,(deger,))
-        thread.start_new_thread(self.getMessage,())
-        #except:
-          #  print "Error: unable to start thread"
-        
-        
 ##        for tweet in tweets:
 ##           if tweet.author.screen_name=="ozansener" :
 ##            print str(tweet.in_reply_to_status_id) + "\n"
@@ -59,6 +45,7 @@ class loadTweets(object):
 ##            # 'retweets': dir(tweet.retweets),
 ##            # 'source_url': tweet.source_url,
 ##            'text': tweet.text,
+##            'created': tweet.created_at,
 ##            'user': tweet.user.screen_name,
 ##            }
 ##            u = {
@@ -90,6 +77,25 @@ class loadTweets(object):
 ##            authors.append(u)
 ##            ts.append(t)        
 ##        print ts
+        print "Select a user:\n"
+        i=0
+        for fw in followers:
+            i+=1
+            print "%d - %s" % (i,fw.screen_name)
+            users[i]=fw.screen_name
+        choice = int(raw_input("make your choice?\n"))
+        
+        #try:
+        deger = str(users[choice])
+        #self.getMessage(deger)
+        thread.start_new_thread(self.sendMessages,(deger,))
+        thread.start_new_thread(self.getMessage,(deger,))
+
+        #except:
+          #  print "Error: unable to start thread"
+        
+        
+        
 ##        self.TweetAMessage()
             #self.api.send_direct_message("ozansener","selamlar")
     def TweetAMessage(self):
